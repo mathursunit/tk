@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Taaza Khabarein</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(() => {
+        console.log('Service Worker Registered');
+      });
+    }
+  </script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -80,7 +88,6 @@
       text-align: right;
       font-weight: bold;
     }
-
     @media (max-width: 600px) {
       .news-card {
         padding: 0.8rem;
@@ -90,14 +97,6 @@
       }
     }
   </style>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js').then(() => {
-        console.log('Service Worker Registered');
-      });
-    }
-  </script>
 </head>
 <body>
   <h1>📰 Taaza Khabarein</h1>
@@ -129,6 +128,13 @@
     const refreshIntervalSelect = document.getElementById('refreshInterval');
     const allSources = ['ndtv', 'toi', 'hindu', 'newslaundry'];
 
+    const rssUrls = {
+      ndtv: 'https://feeds.feedburner.com/ndtvnews-top-stories',
+      toi: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
+      hindu: 'https://www.thehindu.com/feeder/default.rss',
+      newslaundry: 'https://www.newslaundry.com/feed'
+    };
+
     let refreshTimer = null;
 
     async function loadNews() {
@@ -138,17 +144,19 @@
 
       for (let source of sources) {
         try {
-          const res = await fetch(`/api/${source}`);
-          const items = await res.json();
-          items.forEach(item => {
-            const imageUrl = (item.enclosure && item.enclosure.url) || '';
+          const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[source])}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          data.items.forEach(item => {
+            const imageUrl = (item.enclosure && item.enclosure.link) || '';
             const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
 
             container.innerHTML += `
               <div class="news-card">
                 ${imageUrl ? `<img src="${imageUrl}" class="news-image" alt="Image"/>` : ''}
                 <div class="news-title"><a href="${item.link}" target="_blank">${item.title}</a></div>
-                <div class="news-snippet">${item.contentSnippet?.slice(0, 100) || ''}...</div>
+                <div class="news-snippet">${item.description?.slice(0, 100) || ''}...</div>
                 <div class="timestamp">${pubDate}</div>
                 <div class="source">${source.toUpperCase()}</div>
               </div>
