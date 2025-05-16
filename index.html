@@ -13,94 +13,24 @@
     }
   </script>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background: #f2f2f2;
-      padding: 1rem;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #222;
-    }
-    .controls {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    select {
-      padding: 0.6rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin: 0 0.5rem;
-    }
-    .news-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-    }
-    .news-card {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      width: 100%;
-      max-width: 320px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .news-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-    .news-image {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 0.75rem;
-    }
-    .news-title a {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #111;
-      text-decoration: none;
-    }
-    .news-title a:hover {
-      text-decoration: underline;
-    }
-    .news-snippet {
-      font-size: 0.95rem;
-      color: #444;
-      margin: 0.75rem 0;
-    }
-    .timestamp {
-      font-size: 0.8rem;
-      color: #888;
-    }
-    .source {
-      color: #555;
-      font-size: 0.85rem;
-      text-align: right;
-      font-weight: bold;
-    }
-    @media (max-width: 600px) {
-      .news-card {
-        padding: 0.8rem;
-      }
-      .news-image {
-        height: 140px;
-      }
-    }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f2f2f2; padding: 1rem; }
+    h1 { text-align: center; margin-bottom: 1rem; }
+    .controls { text-align: center; margin-bottom: 1.5rem; }
+    select { padding: 0.6rem; font-size: 1rem; margin: 0 0.5rem; border-radius: 6px; }
+    .news-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+    .news-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                 width: 100%; max-width: 320px; padding: 1rem; display: flex; flex-direction: column; }
+    .news-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+    .news-image { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 0.75rem; }
+    .news-title a { font-size: 1.1rem; font-weight: bold; color: #111; text-decoration: none; }
+    .news-title a:hover { text-decoration: underline; }
+    .news-snippet { font-size: 0.95rem; color: #444; margin: 0.75rem 0; }
+    .timestamp { font-size: 0.8rem; color: #888; }
+    .source { color: #555; font-size: 0.85rem; text-align: right; font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>📰 Taaza Khabarein</h1>
-
   <div class="controls">
     <label for="sourceSelect">Filter by Source:</label>
     <select id="sourceSelect" onchange="loadNews()">
@@ -110,7 +40,6 @@
       <option value="hindu">Hindu</option>
       <option value="newslaundry">Newslaundry</option>
     </select>
-
     <label for="refreshInterval">Auto Refresh:</label>
     <select id="refreshInterval" onchange="updateRefreshInterval()">
       <option value="0">Off</option>
@@ -119,39 +48,31 @@
       <option value="900000">Every 15 mins</option>
     </select>
   </div>
-
   <div class="news-grid" id="news-container">Loading...</div>
-
   <script>
     const container = document.getElementById('news-container');
     const sourceSelect = document.getElementById('sourceSelect');
     const refreshIntervalSelect = document.getElementById('refreshInterval');
     const allSources = ['ndtv', 'toi', 'hindu', 'newslaundry'];
-
     const rssUrls = {
       ndtv: 'https://feeds.feedburner.com/ndtvnews-top-stories',
       toi: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
       hindu: 'https://www.thehindu.com/feeder/default.rss',
       newslaundry: 'https://www.newslaundry.com/feed'
     };
-
     let refreshTimer = null;
-
     async function loadNews() {
       container.innerHTML = '';
       const selectedSource = sourceSelect.value;
       const sources = selectedSource === 'all' ? allSources : [selectedSource];
-
       for (let source of sources) {
         try {
           const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[source])}`;
           const res = await fetch(url);
           const data = await res.json();
-
           data.items.forEach(item => {
             const imageUrl = (item.enclosure && item.enclosure.link) || '';
             const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
-
             container.innerHTML += `
               <div class="news-card">
                 ${imageUrl ? `<img src="${imageUrl}" class="news-image" alt="Image"/>` : ''}
@@ -167,7 +88,6 @@
         }
       }
     }
-
     function updateRefreshInterval() {
       const interval = parseInt(refreshIntervalSelect.value);
       if (refreshTimer) clearInterval(refreshTimer);
@@ -175,7 +95,6 @@
         refreshTimer = setInterval(loadNews, interval);
       }
     }
-
     loadNews();
   </script>
 </body>
