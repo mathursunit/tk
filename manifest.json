@@ -1,0 +1,67 @@
+{
+  "name": "Taaza Khabarein",
+  "short_name": "Taaza",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#ffffff",
+  "theme_color": "#222222",
+  "orientation": "portrait",
+  "description": "Taaza Khabarein delivers real-time Indian news from top sources in a beautiful, fast-loading interface.",
+  "dir": "ltr",
+  "lang": "en",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": {
+    "urls": [
+      "https://www.taazakhabar.in/*"
+    ]
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+taaza",
+      "url": "https://www.taazakhabar.in/?q=%s"
+    }
+  ],
+  "categories": [
+    "news",
+    "media"
+  ],
+  "iarc_rating_id": "eC",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.taazakhabar.app",
+      "id": "com.taazakhabar.app"
+    }
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "type": "image/png",
+      "sizes": "540x720"
+    }
+  ]
+}
