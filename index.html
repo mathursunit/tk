@@ -38,6 +38,11 @@
       <option value="hindu">Hindu</option>
       <option value="newslaundry">Newslaundry</option>
       <option value="deccan">Deccan Chronicle</option>
+      <option value="ht">Hindustan Times</option>
+      <option value="indianexpress">Indian Express</option>
+      <option value="indiatoday">India Today</option>
+      <option value="mint">LiveMint</option>
+      <option value="bbc">BBC India</option>
     </select>
     <label for="refreshInterval">Auto Refresh:</label>
     <select id="refreshInterval" onchange="updateRefreshInterval()">
@@ -52,13 +57,18 @@
     const container = document.getElementById('news-container');
     const sourceSelect = document.getElementById('sourceSelect');
     const refreshIntervalSelect = document.getElementById('refreshInterval');
-    const allSources = ['ndtv', 'toi', 'hindu', 'newslaundry', 'deccan'];
+    const allSources = ['ndtv', 'toi', 'hindu', 'newslaundry', 'deccan', 'ht', 'indianexpress', 'indiatoday', 'mint', 'bbc'];
     const rssUrls = {
       ndtv: 'https://feeds.feedburner.com/ndtvnews-top-stories',
       toi: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
       hindu: 'https://www.thehindu.com/feeder/default.rss',
       newslaundry: 'https://www.newslaundry.com/feed',
-      deccan: 'http://www.deccanchronicle.com/rss.xml'
+      deccan: 'http://www.deccanchronicle.com/rss.xml',
+      ht: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml',
+      indianexpress: 'https://indianexpress.com/section/india/feed/',
+      indiatoday: 'https://www.indiatoday.in/rss/1206584',
+      mint: 'https://www.livemint.com/rss/news',
+      bbc: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml'
     };
     let refreshTimer = null;
     async function loadNews() {

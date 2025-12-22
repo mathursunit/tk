@@ -1,6 +1,6 @@
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('taaza-cache').then(cache => {
+    caches.open('taaza-cache-v2').then(cache => {
       return cache.addAll([
         '/',
         '/index.html',
