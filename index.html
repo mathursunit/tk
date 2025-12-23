@@ -216,6 +216,7 @@
               await registration.showNotification('Taaza Debug', {
                 body: `Test at ${new Date().toLocaleTimeString()}`,
               });
+              alert("Sent! Check Notification Center (Swipe Down).");
             } catch (e) {
               alert("Error sending: " + e.message);
             }
