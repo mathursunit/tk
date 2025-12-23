@@ -142,7 +142,7 @@
 <body>
 
   <body>
-    <div class="version-badge">v3.9</div>
+    <div class="version-badge">v3.10</div>
     <h1>📰 Taaza Khabarein</h1>
     <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
     <div class="controls" id="controls-panel">
@@ -150,6 +150,7 @@
       <select id="topicSelect" onchange="updateTopics()">
         <option value="news">News</option>
         <option value="bollywood">Bollywood</option>
+        <option value="hyderabad">Hyderabad</option>
         <option value="syracuse">Syracuse, NY</option>
       </select>
       <label for="sourceSelect">Source:</label>
@@ -200,6 +201,14 @@
           daily_orange: { name: 'The Daily Orange', url: 'https://dailyorange.com/feed/' },
           urban_cny: { name: 'Urban CNY', url: 'https://www.urbancny.com/feed/' },
           waer: { name: 'WAER 88.3', url: 'https://www.waer.org/rss.xml' }
+        },
+        hyderabad: {
+          siasat: { name: 'Siasat Daily', url: 'https://www.siasat.com/feed/' },
+          telangana_today: { name: 'Telangana Today', url: 'https://telanganatoday.com/feed' },
+          hindu_hyd: { name: 'The Hindu Hyd', url: 'https://www.thehindu.com/news/cities/Hyderabad/feeder/default.rss' },
+          toi_hyd: { name: 'TOI Hyderabad', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms' },
+          hans_hyd: { name: 'The Hans India', url: 'https://www.thehansindia.com/rss/hyderabad' },
+          deccan_hyd: { name: 'Deccan Chronicle', url: 'https://www.deccanchronicle.com/rss.xml' }
         }
       };
 
