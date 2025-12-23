@@ -1,6 +1,6 @@
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('taaza-cache-v3').then(cache => {
+    caches.open('taaza-cache-v4').then(cache => {
       return cache.addAll([
         '/',
         '/index.html',
@@ -8,10 +8,9 @@ self.addEventListener('install', event => {
         '/icon-192.png',
         '/icon-512.png'
       ]);
-      ]);
-})
+    })
   );
-self.skipWaiting();
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
@@ -25,14 +24,4 @@ self.addEventListener('fetch', event => {
   );
 });
 
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      if (clientList.length > 0) {
-        return clientList[0].focus();
-      }
-      return clients.openWindow('/');
-    })
-  );
-});
+
