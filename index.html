@@ -142,7 +142,7 @@
 <body>
 
   <body>
-    <div class="version-badge">v3.8</div>
+    <div class="version-badge">v3.9</div>
     <h1>📰 Taaza Khabarein</h1>
     <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
     <div class="controls" id="controls-panel">
@@ -150,6 +150,7 @@
       <select id="topicSelect" onchange="updateTopics()">
         <option value="news">News</option>
         <option value="bollywood">Bollywood</option>
+        <option value="syracuse">Syracuse, NY</option>
       </select>
       <label for="sourceSelect">Source:</label>
       <select id="sourceSelect" onchange="loadNews()">
@@ -191,6 +192,14 @@
           ndtv_movies: { name: 'NDTV Movies', url: 'https://feeds.feedburner.com/ndtvmovies-latest' },
           ht_bollywood: { name: 'HT Bollywood', url: 'https://www.hindustantimes.com/feeds/rss/entertainment/bollywood/rssfeed.xml' },
           filmibeat: { name: 'Filmibeat', url: 'https://www.filmibeat.com/rss/bollywood-news-fb.xml' }
+        },
+        syracuse: {
+          syracuse_com: { name: 'Syracuse.com', url: 'https://www.syracuse.com/arc/outboundfeeds/rss/' },
+          wsyr: { name: 'WSYR News 9', url: 'https://www.localsyr.com/feed/' },
+          cny_central: { name: 'CNY Central', url: 'https://cnycentral.com/news/local.rss' },
+          daily_orange: { name: 'The Daily Orange', url: 'https://dailyorange.com/feed/' },
+          urban_cny: { name: 'Urban CNY', url: 'https://www.urbancny.com/feed/' },
+          waer: { name: 'WAER 88.3', url: 'https://www.waer.org/rss.xml' }
         }
       };
 
