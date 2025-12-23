@@ -140,93 +140,145 @@
 </head>
 
 <body>
-  <div class="version-badge">v3.6</div>
-  <h1>📰 Taaza Khabarein</h1>
-  <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
-  <div class="controls" id="controls-panel">
-    <label for="sourceSelect">Filter by Source:</label>
-    <select id="sourceSelect" onchange="loadNews()">
-      <option value="all">All</option>
-      <option value="ndtv">NDTV</option>
-      <option value="toi">TOI</option>
-      <option value="hindu">Hindu</option>
-      <option value="newslaundry">Newslaundry</option>
-      <option value="deccan">Deccan Chronicle</option>
-      <option value="ht">Hindustan Times</option>
-      <option value="indianexpress">Indian Express</option>
-      <option value="indiatoday">India Today</option>
-      <option value="mint">LiveMint</option>
-      <option value="bbc">BBC India</option>
-    </select>
-    <label for="refreshInterval">Auto Refresh:</label>
-    <select id="refreshInterval" onchange="updateRefreshInterval()">
-      <option value="0">Off</option>
-      <option value="300000">Every 5 mins</option>
-      <option value="600000">Every 10 mins</option>
-      <option value="900000" selected>Every 15 mins</option>
-    </select>
-  </div>
-  <div class="news-grid" id="news-container">Loading...</div>
-  <script>
-    const container = document.getElementById('news-container');
-    const sourceSelect = document.getElementById('sourceSelect');
-    const refreshIntervalSelect = document.getElementById('refreshInterval');
-    const allSources = ['ndtv', 'toi', 'hindu', 'newslaundry', 'deccan', 'ht', 'indianexpress', 'indiatoday', 'mint', 'bbc'];
-    const rssUrls = {
-      ndtv: 'https://feeds.feedburner.com/ndtvnews-top-stories',
-      toi: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms',
-      hindu: 'https://www.thehindu.com/feeder/default.rss',
-      newslaundry: 'https://www.newslaundry.com/feed',
-      deccan: 'http://www.deccanchronicle.com/rss.xml',
-      ht: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml',
-      indianexpress: 'https://indianexpress.com/section/india/feed/',
-      indiatoday: 'https://www.indiatoday.in/rss/1206584',
-      mint: 'https://www.livemint.com/rss/news',
-      bbc: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml'
-    };
-    let refreshTimer = null;
-    async function loadNews() {
-      container.innerHTML = '';
-      const selectedSource = sourceSelect.value;
-      const sources = selectedSource === 'all' ? allSources : [selectedSource];
-      for (let source of sources) {
-        try {
-          const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[source])}`;
-          const res = await fetch(url);
-          const data = await res.json();
-          data.items.forEach(item => {
-            const imageUrl = (item.enclosure && item.enclosure.link) || '';
-            const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
-            container.innerHTML += `
+
+  <body>
+    <div class="version-badge">v3.7</div>
+    <h1>📰 Taaza Khabarein</h1>
+    <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
+    <div class="controls" id="controls-panel">
+      <label for="topicSelect">Topic:</label>
+      <select id="topicSelect" onchange="updateTopics()">
+        <option value="news">News</option>
+        <option value="bollywood">Bollywood</option>
+      </select>
+      <label for="sourceSelect">Source:</label>
+      <select id="sourceSelect" onchange="loadNews()">
+        <!-- Options popluated by JS -->
+      </select>
+      <label for="refreshInterval">Auto Refresh:</label>
+      <select id="refreshInterval" onchange="updateRefreshInterval()">
+        <option value="0">Off</option>
+        <option value="300000">Every 5 mins</option>
+        <option value="600000">Every 10 mins</option>
+        <option value="900000" selected>Every 15 mins</option>
+      </select>
+    </div>
+    <div class="news-grid" id="news-container">Loading...</div>
+    <script>
+      const container = document.getElementById('news-container');
+      const sourceSelect = document.getElementById('sourceSelect');
+      const topicSelect = document.getElementById('topicSelect');
+      const refreshIntervalSelect = document.getElementById('refreshInterval');
+
+      // Data Structure: Topics -> Sources -> { name, url }
+      const feedsData = {
+        news: {
+          ndtv: { name: 'NDTV', url: 'https://feeds.feedburner.com/ndtvnews-top-stories' },
+          toi: { name: 'TOI', url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms' },
+          hindu: { name: 'Hindu', url: 'https://www.thehindu.com/feeder/default.rss' },
+          newslaundry: { name: 'Newslaundry', url: 'https://www.newslaundry.com/feed' },
+          deccan: { name: 'Deccan Chronicle', url: 'http://www.deccanchronicle.com/rss.xml' },
+          ht: { name: 'Hindustan Times', url: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml' },
+          indianexpress: { name: 'Indian Express', url: 'https://indianexpress.com/section/india/feed/' },
+          indiatoday: { name: 'India Today', url: 'https://www.indiatoday.in/rss/1206584' },
+          mint: { name: 'LiveMint', url: 'https://www.livemint.com/rss/news' },
+          bbc: { name: 'BBC India', url: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml' }
+        },
+        bollywood: {
+          hungama: { name: 'Bollywood Hungama', url: 'http://www.bollywoodhungama.com/rss/news.xml' },
+          koimoi: { name: 'Koimoi', url: 'https://www.koimoi.com/feed/' },
+          toi_ent: { name: 'TOI Entertainment', url: 'https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms' },
+          ndtv_movies: { name: 'NDTV Movies', url: 'https://feeds.feedburner.com/ndtvmovies-latest' },
+          ht_bollywood: { name: 'HT Bollywood', url: 'https://www.hindustantimes.com/feeds/rss/entertainment/bollywood/rssfeed.xml' },
+          filmibeat: { name: 'Filmibeat', url: 'https://www.filmibeat.com/rss/bollywood-news-fb.xml' }
+        }
+      };
+
+      let refreshTimer = null;
+
+      function updateTopics() {
+        const topic = topicSelect.value;
+        const sources = feedsData[topic];
+
+        // Clear and populate source select
+        sourceSelect.innerHTML = '<option value="all">All Sources</option>';
+        for (let key in sources) {
+          const opt = document.createElement('option');
+          opt.value = key;
+          opt.innerText = sources[key].name;
+          sourceSelect.appendChild(opt);
+        }
+        loadNews();
+      }
+
+      async function loadNews() {
+        container.innerHTML = '<div class="news-card">Loading...</div>'; // Better loading state
+        const topic = topicSelect.value;
+        const selectedSource = sourceSelect.value;
+
+        let sourcesToFetch = [];
+        if (selectedSource === 'all') {
+          sourcesToFetch = Object.keys(feedsData[topic]);
+        } else {
+          sourcesToFetch = [selectedSource];
+        }
+
+        container.innerHTML = '';
+
+        for (let key of sourcesToFetch) {
+          try {
+            const feedInfo = feedsData[topic][key];
+            // Use RSS2JSON or a proxy if needed. Note: Some feeds might choke on default proxy.
+            // Using rss2json as before.
+            const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedInfo.url)}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.status !== 'ok') throw new Error('Feed failed');
+
+            data.items.forEach(item => {
+              const imageUrl = (item.enclosure && item.enclosure.link) ||
+                (item.thumbnail) || ''; // Some feeds use thumbnail
+
+              const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
+
+              container.innerHTML += `
               <div class="news-card">
                 ${imageUrl ? `<img src="${imageUrl}" class="news-image" alt="Image"/>` : ''}
                 <div class="news-title"><a href="${item.link}" target="_blank">${item.title}</a></div>
-                <div class="news-snippet">${item.description?.slice(0, 100) || ''}...</div>
+                <div class="news-snippet">${item.description?.replace(/<[^>]*>?/gm, '').slice(0, 100) || ''}...</div>
                 <div class="timestamp">${pubDate}</div>
-                <div class="source">${source.toUpperCase()}</div>
+                <div class="source">${feedInfo.name}</div>
               </div>
             `;
-          });
-        } catch {
-          container.innerHTML += `<div class="news-card">❌ Failed to load from ${source}</div>`;
+            });
+          } catch (e) {
+            // container.innerHTML += `<div class="news-card">❌ ${key} error</div>`;
+            console.error(e);
+          }
+        }
+
+        if (container.innerHTML === '') {
+          container.innerHTML = '<div style="width:100%;text-align:center;">No news found or connection error.</div>';
         }
       }
-    }
-    function updateRefreshInterval() {
-      const interval = parseInt(refreshIntervalSelect.value);
-      if (refreshTimer) clearInterval(refreshTimer);
-      if (interval > 0) {
-        refreshTimer = setInterval(loadNews, interval);
+      function updateRefreshInterval() {
+        const interval = parseInt(refreshIntervalSelect.value);
+        if (refreshTimer) clearInterval(refreshTimer);
+        if (interval > 0) {
+          refreshTimer = setInterval(loadNews, interval);
+        }
+      }
+      function toggleControls() {
+        const panel = document.getElementById('controls-panel');
+        panel.classList.toggle('visible');
       }
     }
-    function toggleControls() {
-      const panel = document.getElementById('controls-panel');
-      panel.classList.toggle('visible');
-    }
-    loadNews();
-    updateRefreshInterval();
-  </script>
-</body>
+      updateTopics(); // Initialize options
+      updateRefreshInterval();
+    </script>
+  </body>
 </body>
 
 </html>
