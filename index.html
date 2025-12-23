@@ -99,12 +99,50 @@
       text-align: right;
       font-weight: bold;
     }
+
+    .version-badge {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toggle-btn {
+      display: block;
+      margin: 0 auto 10px auto;
+      background: none;
+      border: 1px solid #ccc;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      display: none;
+      /* Hidden by default or toggled */
+    }
+
+    .controls.visible {
+      display: block;
+    }
   </style>
 </head>
 
 <body>
+  <div class="version-badge">v3.6</div>
   <h1>📰 Taaza Khabarein</h1>
-  <div class="controls">
+  <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
+  <div class="controls" id="controls-panel">
     <label for="sourceSelect">Filter by Source:</label>
     <select id="sourceSelect" onchange="loadNews()">
       <option value="all">All</option>
@@ -180,10 +218,16 @@
         refreshTimer = setInterval(loadNews, interval);
       }
     }
+    function toggleControls() {
+      const panel = document.getElementById('controls-panel');
+      panel.classList.toggle('visible');
+    }
     loadNews();
     updateRefreshInterval();
   </script>
 </body>
 </body>
+
+</html>
 
 </html>
