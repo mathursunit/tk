@@ -165,7 +165,7 @@
 </head>
 
 <body>
-  <div class="version-badge">v3.12</div>
+  <div class="version-badge">v3.13</div>
   <h1>📰 Taaza Khabarein</h1>
   <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
   <div class="controls" id="controls-panel">
@@ -332,12 +332,16 @@
     async function shareArticle(event, title, url) {
       event.preventDefault();
       event.stopPropagation();
+
+      // Add tracking parameter
+      const trackingUrl = url.includes('?') ? `${url}&ref=tk` : `${url}?ref=tk`;
+
       if (navigator.share) {
         try {
           await navigator.share({
             title: title,
             text: 'Check out this news from Taaza Khabarein: ' + title,
-            url: url
+            url: trackingUrl
           });
         } catch (err) {
           console.log('Error sharing:', err);
@@ -345,7 +349,7 @@
       } else {
         // Fallback: Copy to clipboard
         try {
-          await navigator.clipboard.writeText(`${title} - ${url}`);
+          await navigator.clipboard.writeText(`${title} - ${trackingUrl}`);
           alert('Link copied to clipboard!');
         } catch (err) {
           alert('Could not copy link. Manually copy the URL from the article.');
