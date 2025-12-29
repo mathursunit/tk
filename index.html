@@ -97,8 +97,33 @@
     .source {
       color: #555;
       font-size: 0.85rem;
-      text-align: right;
       font-weight: bold;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+
+    .share-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #00695C;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .share-btn:hover {
+      background: rgba(0, 105, 92, 0.1);
     }
 
     .version-badge {
@@ -142,7 +167,7 @@
 <body>
 
   <body>
-    <div class="version-badge">v3.10</div>
+    <div class="version-badge">v3.11</div>
     <h1>📰 Taaza Khabarein</h1>
     <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
     <div class="controls" id="controls-panel">
@@ -267,7 +292,10 @@
                 <div class="news-title"><a href="${item.link}" target="_blank">${item.title}</a></div>
                 <div class="news-snippet">${item.description?.replace(/<[^>]*>?/gm, '').slice(0, 100) || ''}...</div>
                 <div class="timestamp">${pubDate}</div>
-                <div class="source">${feedInfo.name}</div>
+                <div class="card-actions">
+                   <div class="source">${feedInfo.name}</div>
+                   <button class="share-btn" onclick="shareArticle(event, '${item.title.replace(/'/g, "\\'")}', '${item.link}')" title="Share Article">📤</button>
+                </div>
               </div>
             `;
             });
@@ -291,6 +319,30 @@
       function toggleControls() {
         const panel = document.getElementById('controls-panel');
         panel.classList.toggle('visible');
+      }
+
+      async function shareArticle(event, title, url) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: title,
+              text: 'Check out this news from Taaza Khabarein: ' + title,
+              url: url
+            });
+          } catch (err) {
+            console.log('Error sharing:', err);
+          }
+        } else {
+          // Fallback: Copy to clipboard
+          try {
+            await navigator.clipboard.writeText(`${title} - ${url}`);
+            alert('Link copied to clipboard!');
+          } catch (err) {
+            alert('Could not copy link. Manually copy the URL from the article.');
+          }
+        }
       }
 
       updateTopics(); // Initialize options
