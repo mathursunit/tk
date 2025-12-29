@@ -165,128 +165,126 @@
 </head>
 
 <body>
+  <div class="version-badge">v3.12</div>
+  <h1>📰 Taaza Khabarein</h1>
+  <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
+  <div class="controls" id="controls-panel">
+    <label for="topicSelect">Topic:</label>
+    <select id="topicSelect" onchange="updateTopics()">
+      <option value="news">News</option>
+      <option value="bollywood">Bollywood</option>
+      <option value="hyderabad">Hyderabad</option>
+      <option value="syracuse">Syracuse, NY</option>
+    </select>
+    <label for="sourceSelect">Source:</label>
+    <select id="sourceSelect" onchange="loadNews()">
+      <!-- Options popluated by JS -->
+    </select>
+    <label for="refreshInterval">Auto Refresh:</label>
+    <select id="refreshInterval" onchange="updateRefreshInterval()">
+      <option value="0">Off</option>
+      <option value="300000">Every 5 mins</option>
+      <option value="600000">Every 10 mins</option>
+      <option value="900000" selected>Every 15 mins</option>
+    </select>
+  </div>
+  <div class="news-grid" id="news-container">Loading...</div>
+  <script>
+    const container = document.getElementById('news-container');
+    const sourceSelect = document.getElementById('sourceSelect');
+    const topicSelect = document.getElementById('topicSelect');
+    const refreshIntervalSelect = document.getElementById('refreshInterval');
 
-  <body>
-    <div class="version-badge">v3.11</div>
-    <h1>📰 Taaza Khabarein</h1>
-    <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
-    <div class="controls" id="controls-panel">
-      <label for="topicSelect">Topic:</label>
-      <select id="topicSelect" onchange="updateTopics()">
-        <option value="news">News</option>
-        <option value="bollywood">Bollywood</option>
-        <option value="hyderabad">Hyderabad</option>
-        <option value="syracuse">Syracuse, NY</option>
-      </select>
-      <label for="sourceSelect">Source:</label>
-      <select id="sourceSelect" onchange="loadNews()">
-        <!-- Options popluated by JS -->
-      </select>
-      <label for="refreshInterval">Auto Refresh:</label>
-      <select id="refreshInterval" onchange="updateRefreshInterval()">
-        <option value="0">Off</option>
-        <option value="300000">Every 5 mins</option>
-        <option value="600000">Every 10 mins</option>
-        <option value="900000" selected>Every 15 mins</option>
-      </select>
-    </div>
-    <div class="news-grid" id="news-container">Loading...</div>
-    <script>
-      const container = document.getElementById('news-container');
-      const sourceSelect = document.getElementById('sourceSelect');
-      const topicSelect = document.getElementById('topicSelect');
-      const refreshIntervalSelect = document.getElementById('refreshInterval');
+    // Data Structure: Topics -> Sources -> { name, url }
+    const feedsData = {
+      news: {
+        ndtv: { name: 'NDTV', url: 'https://feeds.feedburner.com/ndtvnews-top-stories' },
+        toi: { name: 'TOI', url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms' },
+        hindu: { name: 'Hindu', url: 'https://www.thehindu.com/feeder/default.rss' },
+        newslaundry: { name: 'Newslaundry', url: 'https://www.newslaundry.com/feed' },
+        deccan: { name: 'Deccan Chronicle', url: 'http://www.deccanchronicle.com/rss.xml' },
+        ht: { name: 'Hindustan Times', url: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml' },
+        indianexpress: { name: 'Indian Express', url: 'https://indianexpress.com/section/india/feed/' },
+        indiatoday: { name: 'India Today', url: 'https://www.indiatoday.in/rss/1206584' },
+        mint: { name: 'LiveMint', url: 'https://www.livemint.com/rss/news' },
+        bbc: { name: 'BBC India', url: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml' }
+      },
+      bollywood: {
+        hungama: { name: 'Bollywood Hungama', url: 'http://www.bollywoodhungama.com/rss/news.xml' },
+        koimoi: { name: 'Koimoi', url: 'https://www.koimoi.com/feed/' },
+        toi_ent: { name: 'TOI Entertainment', url: 'https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms' },
+        ndtv_movies: { name: 'NDTV Movies', url: 'https://feeds.feedburner.com/ndtvmovies-latest' },
+        ht_bollywood: { name: 'HT Bollywood', url: 'https://www.hindustantimes.com/feeds/rss/entertainment/bollywood/rssfeed.xml' },
+        filmibeat: { name: 'Filmibeat', url: 'https://www.filmibeat.com/rss/bollywood-news-fb.xml' }
+      },
+      syracuse: {
+        syracuse_com: { name: 'Syracuse.com', url: 'https://www.syracuse.com/arc/outboundfeeds/rss/' },
+        wsyr: { name: 'WSYR News 9', url: 'https://www.localsyr.com/feed/' },
+        cny_central: { name: 'CNY Central', url: 'https://cnycentral.com/news/local.rss' },
+        daily_orange: { name: 'The Daily Orange', url: 'https://dailyorange.com/feed/' },
+        urban_cny: { name: 'Urban CNY', url: 'https://www.urbancny.com/feed/' },
+        waer: { name: 'WAER 88.3', url: 'https://www.waer.org/rss.xml' }
+      },
+      hyderabad: {
+        siasat: { name: 'Siasat Daily', url: 'https://www.siasat.com/feed/' },
+        telangana_today: { name: 'Telangana Today', url: 'https://telanganatoday.com/feed' },
+        hindu_hyd: { name: 'The Hindu Hyd', url: 'https://www.thehindu.com/news/cities/Hyderabad/feeder/default.rss' },
+        toi_hyd: { name: 'TOI Hyderabad', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms' },
+        hans_hyd: { name: 'The Hans India', url: 'https://www.thehansindia.com/rss/hyderabad' },
+        deccan_hyd: { name: 'Deccan Chronicle', url: 'https://www.deccanchronicle.com/rss.xml' }
+      }
+    };
 
-      // Data Structure: Topics -> Sources -> { name, url }
-      const feedsData = {
-        news: {
-          ndtv: { name: 'NDTV', url: 'https://feeds.feedburner.com/ndtvnews-top-stories' },
-          toi: { name: 'TOI', url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms' },
-          hindu: { name: 'Hindu', url: 'https://www.thehindu.com/feeder/default.rss' },
-          newslaundry: { name: 'Newslaundry', url: 'https://www.newslaundry.com/feed' },
-          deccan: { name: 'Deccan Chronicle', url: 'http://www.deccanchronicle.com/rss.xml' },
-          ht: { name: 'Hindustan Times', url: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml' },
-          indianexpress: { name: 'Indian Express', url: 'https://indianexpress.com/section/india/feed/' },
-          indiatoday: { name: 'India Today', url: 'https://www.indiatoday.in/rss/1206584' },
-          mint: { name: 'LiveMint', url: 'https://www.livemint.com/rss/news' },
-          bbc: { name: 'BBC India', url: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml' }
-        },
-        bollywood: {
-          hungama: { name: 'Bollywood Hungama', url: 'http://www.bollywoodhungama.com/rss/news.xml' },
-          koimoi: { name: 'Koimoi', url: 'https://www.koimoi.com/feed/' },
-          toi_ent: { name: 'TOI Entertainment', url: 'https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms' },
-          ndtv_movies: { name: 'NDTV Movies', url: 'https://feeds.feedburner.com/ndtvmovies-latest' },
-          ht_bollywood: { name: 'HT Bollywood', url: 'https://www.hindustantimes.com/feeds/rss/entertainment/bollywood/rssfeed.xml' },
-          filmibeat: { name: 'Filmibeat', url: 'https://www.filmibeat.com/rss/bollywood-news-fb.xml' }
-        },
-        syracuse: {
-          syracuse_com: { name: 'Syracuse.com', url: 'https://www.syracuse.com/arc/outboundfeeds/rss/' },
-          wsyr: { name: 'WSYR News 9', url: 'https://www.localsyr.com/feed/' },
-          cny_central: { name: 'CNY Central', url: 'https://cnycentral.com/news/local.rss' },
-          daily_orange: { name: 'The Daily Orange', url: 'https://dailyorange.com/feed/' },
-          urban_cny: { name: 'Urban CNY', url: 'https://www.urbancny.com/feed/' },
-          waer: { name: 'WAER 88.3', url: 'https://www.waer.org/rss.xml' }
-        },
-        hyderabad: {
-          siasat: { name: 'Siasat Daily', url: 'https://www.siasat.com/feed/' },
-          telangana_today: { name: 'Telangana Today', url: 'https://telanganatoday.com/feed' },
-          hindu_hyd: { name: 'The Hindu Hyd', url: 'https://www.thehindu.com/news/cities/Hyderabad/feeder/default.rss' },
-          toi_hyd: { name: 'TOI Hyderabad', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms' },
-          hans_hyd: { name: 'The Hans India', url: 'https://www.thehansindia.com/rss/hyderabad' },
-          deccan_hyd: { name: 'Deccan Chronicle', url: 'https://www.deccanchronicle.com/rss.xml' }
-        }
-      };
+    let refreshTimer = null;
 
-      let refreshTimer = null;
+    function updateTopics() {
+      const topic = topicSelect.value;
+      const sources = feedsData[topic];
 
-      function updateTopics() {
-        const topic = topicSelect.value;
-        const sources = feedsData[topic];
+      // Clear and populate source select
+      sourceSelect.innerHTML = '<option value="all">All Sources</option>';
+      for (let key in sources) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = sources[key].name;
+        sourceSelect.appendChild(opt);
+      }
+      loadNews();
+    }
 
-        // Clear and populate source select
-        sourceSelect.innerHTML = '<option value="all">All Sources</option>';
-        for (let key in sources) {
-          const opt = document.createElement('option');
-          opt.value = key;
-          opt.innerText = sources[key].name;
-          sourceSelect.appendChild(opt);
-        }
-        loadNews();
+    async function loadNews() {
+      container.innerHTML = '<div class="news-card">Loading...</div>'; // Better loading state
+      const topic = topicSelect.value;
+      const selectedSource = sourceSelect.value;
+
+      let sourcesToFetch = [];
+      if (selectedSource === 'all') {
+        sourcesToFetch = Object.keys(feedsData[topic]);
+      } else {
+        sourcesToFetch = [selectedSource];
       }
 
-      async function loadNews() {
-        container.innerHTML = '<div class="news-card">Loading...</div>'; // Better loading state
-        const topic = topicSelect.value;
-        const selectedSource = sourceSelect.value;
+      container.innerHTML = '';
 
-        let sourcesToFetch = [];
-        if (selectedSource === 'all') {
-          sourcesToFetch = Object.keys(feedsData[topic]);
-        } else {
-          sourcesToFetch = [selectedSource];
-        }
+      for (let key of sourcesToFetch) {
+        try {
+          const feedInfo = feedsData[topic][key];
+          // Use RSS2JSON or a proxy if needed. Note: Some feeds might choke on default proxy.
+          // Using rss2json as before.
+          const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedInfo.url)}`;
 
-        container.innerHTML = '';
+          const res = await fetch(url);
+          const data = await res.json();
 
-        for (let key of sourcesToFetch) {
-          try {
-            const feedInfo = feedsData[topic][key];
-            // Use RSS2JSON or a proxy if needed. Note: Some feeds might choke on default proxy.
-            // Using rss2json as before.
-            const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedInfo.url)}`;
+          if (data.status !== 'ok') throw new Error('Feed failed');
 
-            const res = await fetch(url);
-            const data = await res.json();
+          data.items.forEach(item => {
+            const imageUrl = (item.enclosure && item.enclosure.link) ||
+              (item.thumbnail) || ''; // Some feeds use thumbnail
 
-            if (data.status !== 'ok') throw new Error('Feed failed');
+            const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
 
-            data.items.forEach(item => {
-              const imageUrl = (item.enclosure && item.enclosure.link) ||
-                (item.thumbnail) || ''; // Some feeds use thumbnail
-
-              const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
-
-              container.innerHTML += `
+            container.innerHTML += `
               <div class="news-card">
                 ${imageUrl ? `<img src="${imageUrl}" class="news-image" alt="Image"/>` : ''}
                 <div class="news-title"><a href="${item.link}" target="_blank">${item.title}</a></div>
@@ -294,60 +292,70 @@
                 <div class="timestamp">${pubDate}</div>
                 <div class="card-actions">
                    <div class="source">${feedInfo.name}</div>
-                   <button class="share-btn" onclick="shareArticle(event, '${item.title.replace(/'/g, "\\'")}', '${item.link}')" title="Share Article">📤</button>
+                   <button class="share-btn" 
+                           data-title="${item.title.replace(/"/g, '&quot;')}" 
+                           data-url="${item.link}" 
+                           onclick="handleShare(this, event)" 
+                           title="Share Article">📤</button>
                 </div>
               </div>
             `;
-            });
-          } catch (e) {
-            // container.innerHTML += `<div class="news-card">❌ ${key} error</div>`;
-            console.error(e);
-          }
-        }
-
-        if (container.innerHTML === '') {
-          container.innerHTML = '<div style="width:100%;text-align:center;">No news found or connection error.</div>';
-        }
-      }
-      function updateRefreshInterval() {
-        const interval = parseInt(refreshIntervalSelect.value);
-        if (refreshTimer) clearInterval(refreshTimer);
-        if (interval > 0) {
-          refreshTimer = setInterval(loadNews, interval);
-        }
-      }
-      function toggleControls() {
-        const panel = document.getElementById('controls-panel');
-        panel.classList.toggle('visible');
-      }
-
-      async function shareArticle(event, title, url) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: title,
-              text: 'Check out this news from Taaza Khabarein: ' + title,
-              url: url
-            });
-          } catch (err) {
-            console.log('Error sharing:', err);
-          }
-        } else {
-          // Fallback: Copy to clipboard
-          try {
-            await navigator.clipboard.writeText(`${title} - ${url}`);
-            alert('Link copied to clipboard!');
-          } catch (err) {
-            alert('Could not copy link. Manually copy the URL from the article.');
-          }
+          });
+        } catch (e) {
+          // container.innerHTML += `<div class="news-card">❌ ${key} error</div>`;
+          console.error(e);
         }
       }
 
-      updateTopics(); // Initialize options
-      updateRefreshInterval();
-    </script>
-  </body>
+      if (container.innerHTML === '') {
+        container.innerHTML = '<div style="width:100%;text-align:center;">No news found or connection error.</div>';
+      }
+    }
+    function updateRefreshInterval() {
+      const interval = parseInt(refreshIntervalSelect.value);
+      if (refreshTimer) clearInterval(refreshTimer);
+      if (interval > 0) {
+        refreshTimer = setInterval(loadNews, interval);
+      }
+    }
+    function toggleControls() {
+      const panel = document.getElementById('controls-panel');
+      panel.classList.toggle('visible');
+    }
+
+    function handleShare(btn, event) {
+      const title = btn.getAttribute('data-title');
+      const url = btn.getAttribute('data-url');
+      shareArticle(event, title, url);
+    }
+
+    async function shareArticle(event, title, url) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: title,
+            text: 'Check out this news from Taaza Khabarein: ' + title,
+            url: url
+          });
+        } catch (err) {
+          console.log('Error sharing:', err);
+        }
+      } else {
+        // Fallback: Copy to clipboard
+        try {
+          await navigator.clipboard.writeText(`${title} - ${url}`);
+          alert('Link copied to clipboard!');
+        } catch (err) {
+          alert('Could not copy link. Manually copy the URL from the article.');
+        }
+      }
+    }
+
+    updateTopics(); // Initialize options
+    updateRefreshInterval();
+  </script>
+</body>
 
 </html>
