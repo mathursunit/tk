@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Taaza Khabarein - Fresh news from India and beyond. A fast, lightweight news aggregator." />
+  <meta name="theme-color" content="#222222" />
   <title>Taaza Khabarein</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -16,28 +18,151 @@
     }
   </script>
   <style>
+    :root {
+      --bg: #f2f2f2;
+      --card-bg: #fff;
+      --card-border: #ddd;
+      --title-color: #111;
+      --snippet-color: #444;
+      --timestamp-color: #888;
+      --source-color: #555;
+      --accent: #00695C;
+      --accent-light: rgba(0, 105, 92, 0.1);
+      --shadow: rgba(0, 0, 0, 0.05);
+      --shadow-hover: rgba(0, 0, 0, 0.1);
+      --toggle-border: #ccc;
+      --toggle-color: #555;
+      --select-bg: #fff;
+      --select-color: #333;
+      --search-bg: #fff;
+      --search-border: #ddd;
+      --skeleton-bg: #e0e0e0;
+      --skeleton-shine: #f5f5f5;
+      --toast-bg: #333;
+      --toast-color: #fff;
+      --bookmark-color: #ccc;
+      --bookmark-active: #f59e0b;
+      --badge-bg: rgba(0, 0, 0, 0.6);
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --card-bg: #2a2a2a;
+      --card-border: #3a3a3a;
+      --title-color: #e8e8e8;
+      --snippet-color: #b0b0b0;
+      --timestamp-color: #888;
+      --source-color: #999;
+      --accent: #4db6ac;
+      --accent-light: rgba(77, 182, 172, 0.15);
+      --shadow: rgba(0, 0, 0, 0.2);
+      --shadow-hover: rgba(0, 0, 0, 0.35);
+      --toggle-border: #555;
+      --toggle-color: #aaa;
+      --select-bg: #333;
+      --select-color: #ddd;
+      --search-bg: #333;
+      --search-border: #555;
+      --skeleton-bg: #3a3a3a;
+      --skeleton-shine: #4a4a4a;
+      --toast-bg: #555;
+      --toast-color: #fff;
+      --bookmark-color: #666;
+      --bookmark-active: #f59e0b;
+      --badge-bg: rgba(255, 255, 255, 0.2);
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #f2f2f2;
+      background: var(--bg);
       padding: 1rem;
+      color: var(--title-color);
+      transition: background 0.3s, color 0.3s;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .dark-toggle {
+      background: none;
+      border: 1px solid var(--toggle-border);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--toggle-color);
+      transition: background 0.2s;
+    }
+
+    .dark-toggle:hover {
+      background: var(--accent-light);
     }
 
     .controls {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .controls.visible {
+      display: block;
     }
 
     select {
       padding: 0.6rem;
       font-size: 1rem;
-      margin: 0 0.5rem;
+      margin: 0 0.3rem;
       border-radius: 6px;
+      background: var(--select-bg);
+      color: var(--select-color);
+      border: 1px solid var(--card-border);
+    }
+
+    .search-container {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .search-input {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 20px;
+      border: 1px solid var(--search-border);
+      background: var(--search-bg);
+      color: var(--title-color);
+      width: min(90%, 400px);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-input::placeholder {
+      color: var(--timestamp-color);
+    }
+
+    .article-count {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--timestamp-color);
+      margin-bottom: 0.75rem;
     }
 
     .news-grid {
@@ -48,20 +173,21 @@
     }
 
     .news-card {
-      background: #fff;
-      border: 1px solid #ddd;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 10px var(--shadow);
       width: 100%;
       max-width: 320px;
       padding: 1rem;
       display: flex;
       flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
     }
 
     .news-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 16px var(--shadow-hover);
     }
 
     .news-image {
@@ -75,7 +201,7 @@
     .news-title a {
       font-size: 1.1rem;
       font-weight: bold;
-      color: #111;
+      color: var(--title-color);
       text-decoration: none;
     }
 
@@ -85,17 +211,17 @@
 
     .news-snippet {
       font-size: 0.95rem;
-      color: #444;
+      color: var(--snippet-color);
       margin: 0.75rem 0;
     }
 
     .timestamp {
       font-size: 0.8rem;
-      color: #888;
+      color: var(--timestamp-color);
     }
 
     .source {
-      color: #555;
+      color: var(--source-color);
       font-size: 0.85rem;
       font-weight: bold;
     }
@@ -108,12 +234,17 @@
       padding-top: 0.5rem;
     }
 
-    .share-btn {
+    .card-actions-right {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .share-btn,
+    .bookmark-btn {
       background: none;
       border: none;
       cursor: pointer;
       font-size: 1.1rem;
-      color: #00695C;
       padding: 5px;
       border-radius: 50%;
       transition: background 0.2s;
@@ -122,15 +253,31 @@
       justify-content: center;
     }
 
+    .share-btn {
+      color: var(--accent);
+    }
+
     .share-btn:hover {
-      background: rgba(0, 105, 92, 0.1);
+      background: var(--accent-light);
+    }
+
+    .bookmark-btn {
+      color: var(--bookmark-color);
+    }
+
+    .bookmark-btn:hover {
+      background: var(--accent-light);
+    }
+
+    .bookmark-btn.active {
+      color: var(--bookmark-active);
     }
 
     .version-badge {
       position: fixed;
       top: 10px;
       right: 10px;
-      background: rgba(0, 0, 0, 0.6);
+      background: var(--badge-bg);
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
@@ -143,31 +290,160 @@
       display: block;
       margin: 0 auto 10px auto;
       background: none;
-      border: 1px solid #ccc;
+      border: 1px solid var(--toggle-border);
       padding: 5px 10px;
       border-radius: 4px;
       cursor: pointer;
-      color: #555;
+      color: var(--toggle-color);
       font-size: 0.9rem;
     }
 
-    .controls {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      display: none;
-      /* Hidden by default or toggled */
+    /* Skeleton loading */
+    .skeleton-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 320px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .controls.visible {
-      display: block;
+    .skeleton-line {
+      background: var(--skeleton-bg);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skeleton-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-image {
+      height: 160px;
+      border-radius: 6px;
+    }
+
+    .skeleton-title {
+      height: 20px;
+      width: 85%;
+    }
+
+    .skeleton-text {
+      height: 14px;
+      width: 100%;
+    }
+
+    .skeleton-text-short {
+      height: 14px;
+      width: 60%;
+    }
+
+    @keyframes shimmer {
+      to {
+        left: 100%;
+      }
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--toast-bg);
+      color: var(--toast-color);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Back to top */
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px var(--shadow-hover);
+      z-index: 999;
+      transition: opacity 0.3s;
+    }
+
+    .back-to-top.visible {
+      display: flex;
+    }
+
+    /* Pull to refresh */
+    .pull-indicator {
+      text-align: center;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s, padding 0.2s;
+      color: var(--timestamp-color);
+      font-size: 0.9rem;
+    }
+
+    .pull-indicator.active {
+      max-height: 50px;
+      padding: 10px 0;
+    }
+
+    .pull-indicator.refreshing::after {
+      content: 'Refreshing...';
+    }
+
+    .pull-indicator.pulling::after {
+      content: 'Pull down to refresh';
+    }
+
+    .pull-indicator.ready::after {
+      content: 'Release to refresh';
     }
   </style>
 </head>
 
 <body>
-  <div class="version-badge">v3.13</div>
-  <h1>📰 Taaza Khabarein</h1>
-  <button class="toggle-btn" onclick="toggleControls()">⚙️ Filters & Settings</button>
+  <div class="version-badge">v4.0</div>
+  <div class="header-row">
+    <h1>Taaza Khabarein</h1>
+    <button class="dark-toggle" onclick="toggleDarkMode()" title="Toggle dark mode">
+      <span id="dark-icon">&#9790;</span>
+    </button>
+  </div>
+  <button class="toggle-btn" onclick="toggleControls()">&#9881; Filters & Settings</button>
   <div class="controls" id="controls-panel">
     <label for="topicSelect">Topic:</label>
     <select id="topicSelect" onchange="updateTopics()">
@@ -175,10 +451,13 @@
       <option value="bollywood">Bollywood</option>
       <option value="hyderabad">Hyderabad</option>
       <option value="syracuse">Syracuse, NY</option>
+      <option value="tech">Tech</option>
+      <option value="sports">Sports</option>
+      <option value="business">Business</option>
+      <option value="bookmarks">Bookmarks</option>
     </select>
     <label for="sourceSelect">Source:</label>
     <select id="sourceSelect" onchange="loadNews()">
-      <!-- Options popluated by JS -->
     </select>
     <label for="refreshInterval">Auto Refresh:</label>
     <select id="refreshInterval" onchange="updateRefreshInterval()">
@@ -188,14 +467,27 @@
       <option value="900000" selected>Every 15 mins</option>
     </select>
   </div>
-  <div class="news-grid" id="news-container">Loading...</div>
+  <div class="pull-indicator" id="pull-indicator"></div>
+  <div class="search-container">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search articles..." oninput="filterArticles()" />
+  </div>
+  <div class="article-count" id="article-count"></div>
+  <div class="news-grid" id="news-container"></div>
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Back to top">&#8679;</button>
+  <div class="toast-container"><div class="toast" id="toast"></div></div>
+
   <script>
     const container = document.getElementById('news-container');
     const sourceSelect = document.getElementById('sourceSelect');
     const topicSelect = document.getElementById('topicSelect');
     const refreshIntervalSelect = document.getElementById('refreshInterval');
+    const searchInput = document.getElementById('searchInput');
+    const articleCountEl = document.getElementById('article-count');
+    const backToTopBtn = document.getElementById('backToTop');
 
-    // Data Structure: Topics -> Sources -> { name, url }
+    // All articles currently loaded (for search filtering)
+    let allArticles = [];
+
     const feedsData = {
       news: {
         ndtv: { name: 'NDTV', url: 'https://feeds.feedburner.com/ndtvnews-top-stories' },
@@ -232,16 +524,153 @@
         toi_hyd: { name: 'TOI Hyderabad', url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128816011.cms' },
         hans_hyd: { name: 'The Hans India', url: 'https://www.thehansindia.com/rss/hyderabad' },
         deccan_hyd: { name: 'Deccan Chronicle', url: 'https://www.deccanchronicle.com/rss.xml' }
+      },
+      tech: {
+        techcrunch: { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
+        verge: { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
+        ars: { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' },
+        wired: { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
+        hn: { name: 'Hacker News', url: 'https://hnrss.org/frontpage' }
+      },
+      sports: {
+        cricinfo: { name: 'ESPNcricinfo', url: 'https://www.espncricinfo.com/rss/content/story/feeds/0.xml' },
+        ndtv_sports: { name: 'NDTV Sports', url: 'https://feeds.feedburner.com/ndtvsports-latest' },
+        sportskeeda: { name: 'SportsKeeda', url: 'https://www.sportskeeda.com/feed' },
+        toi_sports: { name: 'TOI Sports', url: 'https://timesofindia.indiatimes.com/rssfeeds/4719148.cms' }
+      },
+      business: {
+        et: { name: 'Economic Times', url: 'https://economictimes.indiatimes.com/rssfeedstopstories.cms' },
+        moneycontrol: { name: 'MoneyControl', url: 'https://www.moneycontrol.com/rss/latestnews.xml' },
+        bs: { name: 'Business Standard', url: 'https://www.business-standard.com/rss/home_page_top_stories.rss' },
+        mint_eco: { name: 'LiveMint Economy', url: 'https://www.livemint.com/rss/economy' }
       }
     };
 
     let refreshTimer = null;
 
+    // --- Bookmarks ---
+    function getBookmarks() {
+      try {
+        return JSON.parse(localStorage.getItem('tk_bookmarks') || '[]');
+      } catch { return []; }
+    }
+
+    function saveBookmarks(bookmarks) {
+      localStorage.setItem('tk_bookmarks', JSON.stringify(bookmarks));
+    }
+
+    function isBookmarked(url) {
+      return getBookmarks().some(b => b.link === url);
+    }
+
+    function toggleBookmark(title, url, source, description, imageUrl) {
+      let bookmarks = getBookmarks();
+      const idx = bookmarks.findIndex(b => b.link === url);
+      if (idx >= 0) {
+        bookmarks.splice(idx, 1);
+        showToast('Bookmark removed');
+      } else {
+        bookmarks.push({ title, link: url, source, description, imageUrl, savedAt: new Date().toISOString() });
+        showToast('Article bookmarked');
+      }
+      saveBookmarks(bookmarks);
+      renderArticles();
+    }
+
+    // --- Toast ---
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // --- Dark mode ---
+    function initDarkMode() {
+      const saved = localStorage.getItem('tk_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      updateDarkIcon();
+    }
+
+    function toggleDarkMode() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('tk_theme', next);
+      updateDarkIcon();
+    }
+
+    function updateDarkIcon() {
+      const icon = document.getElementById('dark-icon');
+      icon.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '\u2600' : '\u263E';
+    }
+
+    // --- Preferences ---
+    function savePreferences() {
+      localStorage.setItem('tk_prefs', JSON.stringify({
+        topic: topicSelect.value,
+        source: sourceSelect.value,
+        refresh: refreshIntervalSelect.value
+      }));
+    }
+
+    function loadPreferences() {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('tk_prefs'));
+        if (prefs) {
+          if (prefs.topic && feedsData[prefs.topic]) topicSelect.value = prefs.topic;
+          if (prefs.topic === 'bookmarks') topicSelect.value = 'bookmarks';
+          if (prefs.refresh) refreshIntervalSelect.value = prefs.refresh;
+        }
+      } catch {}
+    }
+
+    // --- Skeleton loading ---
+    function showSkeletons() {
+      let html = '';
+      for (let i = 0; i < 6; i++) {
+        html += `<div class="skeleton-card">
+          <div class="skeleton-line skeleton-image"></div>
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-text"></div>
+          <div class="skeleton-line skeleton-text-short"></div>
+        </div>`;
+      }
+      container.innerHTML = html;
+      articleCountEl.textContent = '';
+    }
+
+    // --- Deduplication ---
+    function normalizeTitle(title) {
+      return title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    function deduplicateArticles(articles) {
+      const seen = new Set();
+      return articles.filter(a => {
+        const key = normalizeTitle(a.title);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // --- Topic update ---
     function updateTopics() {
       const topic = topicSelect.value;
-      const sources = feedsData[topic];
 
-      // Clear and populate source select
+      if (topic === 'bookmarks') {
+        sourceSelect.innerHTML = '<option value="all">All Bookmarks</option>';
+        loadBookmarksView();
+        savePreferences();
+        return;
+      }
+
+      const sources = feedsData[topic];
       sourceSelect.innerHTML = '<option value="all">All Sources</option>';
       for (let key in sources) {
         const opt = document.createElement('option');
@@ -249,14 +678,43 @@
         opt.innerText = sources[key].name;
         sourceSelect.appendChild(opt);
       }
+
+      // Restore source selection if prefs match
+      try {
+        const prefs = JSON.parse(localStorage.getItem('tk_prefs'));
+        if (prefs && prefs.topic === topic && prefs.source) {
+          sourceSelect.value = prefs.source;
+        }
+      } catch {}
+
       loadNews();
+      savePreferences();
     }
 
-    async function loadNews() {
-      container.innerHTML = '<div class="news-card">Loading...</div>'; // Better loading state
-      const topic = topicSelect.value;
-      const selectedSource = sourceSelect.value;
+    // --- Load bookmarks view ---
+    function loadBookmarksView() {
+      searchInput.value = '';
+      const bookmarks = getBookmarks();
+      allArticles = bookmarks.map(b => ({
+        title: b.title,
+        link: b.link,
+        description: b.description || '',
+        pubDate: b.savedAt,
+        imageUrl: b.imageUrl || '',
+        sourceName: b.source || 'Saved'
+      }));
+      renderArticles();
+    }
 
+    // --- Load news (parallel fetching) ---
+    async function loadNews() {
+      const topic = topicSelect.value;
+      if (topic === 'bookmarks') { loadBookmarksView(); return; }
+
+      showSkeletons();
+      searchInput.value = '';
+
+      const selectedSource = sourceSelect.value;
       let sourcesToFetch = [];
       if (selectedSource === 'all') {
         sourcesToFetch = Object.keys(feedsData[topic]);
@@ -264,65 +722,115 @@
         sourcesToFetch = [selectedSource];
       }
 
-      container.innerHTML = '';
+      // Parallel fetch all feeds
+      const fetchPromises = sourcesToFetch.map(key => {
+        const feedInfo = feedsData[topic][key];
+        const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedInfo.url)}`;
+        return fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            if (data.status !== 'ok') return [];
+            return data.items.map(item => ({
+              title: item.title,
+              link: item.link,
+              description: (item.description || '').replace(/<[^>]*>?/gm, '').slice(0, 100),
+              pubDate: item.pubDate,
+              imageUrl: (item.enclosure && item.enclosure.link) || item.thumbnail || '',
+              sourceName: feedInfo.name
+            }));
+          })
+          .catch(() => []);
+      });
 
-      for (let key of sourcesToFetch) {
-        try {
-          const feedInfo = feedsData[topic][key];
-          // Use RSS2JSON or a proxy if needed. Note: Some feeds might choke on default proxy.
-          // Using rss2json as before.
-          const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedInfo.url)}`;
+      const results = await Promise.allSettled(fetchPromises);
+      let articles = [];
+      results.forEach(r => {
+        if (r.status === 'fulfilled') articles.push(...r.value);
+      });
 
-          const res = await fetch(url);
-          const data = await res.json();
+      // Sort by date descending
+      articles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-          if (data.status !== 'ok') throw new Error('Feed failed');
+      // Deduplicate
+      articles = deduplicateArticles(articles);
 
-          data.items.forEach(item => {
-            const imageUrl = (item.enclosure && item.enclosure.link) ||
-              (item.thumbnail) || ''; // Some feeds use thumbnail
-
-            const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleString() : '';
-
-            container.innerHTML += `
-              <div class="news-card">
-                ${imageUrl ? `<img src="${imageUrl}" class="news-image" alt="Image"/>` : ''}
-                <div class="news-title"><a href="${item.link}" target="_blank">${item.title}</a></div>
-                <div class="news-snippet">${item.description?.replace(/<[^>]*>?/gm, '').slice(0, 100) || ''}...</div>
-                <div class="timestamp">${pubDate}</div>
-                <div class="card-actions">
-                   <div class="source">${feedInfo.name}</div>
-                   <button class="share-btn" 
-                           data-title="${item.title.replace(/"/g, '&quot;')}" 
-                           data-url="${item.link}" 
-                           onclick="handleShare(this, event)" 
-                           title="Share Article">📤</button>
-                </div>
-              </div>
-            `;
-          });
-        } catch (e) {
-          // container.innerHTML += `<div class="news-card">❌ ${key} error</div>`;
-          console.error(e);
-        }
-      }
-
-      if (container.innerHTML === '') {
-        container.innerHTML = '<div style="width:100%;text-align:center;">No news found or connection error.</div>';
-      }
+      allArticles = articles;
+      renderArticles();
+      savePreferences();
     }
+
+    // --- Render articles ---
+    function renderArticles() {
+      const query = searchInput.value.toLowerCase().trim();
+      let filtered = allArticles;
+
+      if (query) {
+        filtered = allArticles.filter(a =>
+          a.title.toLowerCase().includes(query) ||
+          a.description.toLowerCase().includes(query) ||
+          a.sourceName.toLowerCase().includes(query)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="width:100%;text-align:center;color:var(--timestamp-color);">No articles found.</div>';
+        articleCountEl.textContent = '';
+        return;
+      }
+
+      articleCountEl.textContent = `Showing ${filtered.length} article${filtered.length !== 1 ? 's' : ''}`;
+
+      const html = filtered.map(article => {
+        const pubDate = article.pubDate ? new Date(article.pubDate).toLocaleString() : '';
+        const bookmarked = isBookmarked(article.link);
+        const escapedTitle = article.title.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const escapedDesc = article.description.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+        return `<div class="news-card">
+          ${article.imageUrl ? `<img src="${article.imageUrl}" class="news-image" alt="" loading="lazy" onerror="this.style.display='none'" />` : ''}
+          <div class="news-title"><a href="${article.link}" target="_blank">${article.title}</a></div>
+          <div class="news-snippet">${article.description}${article.description ? '...' : ''}</div>
+          <div class="timestamp">${pubDate}</div>
+          <div class="card-actions">
+            <div class="source">${article.sourceName}</div>
+            <div class="card-actions-right">
+              <button class="bookmark-btn ${bookmarked ? 'active' : ''}"
+                      onclick="toggleBookmark('${escapedTitle}', '${article.link}', '${article.sourceName}', '${escapedDesc}', '${article.imageUrl}')"
+                      title="${bookmarked ? 'Remove bookmark' : 'Bookmark'}">&#9733;</button>
+              <button class="share-btn"
+                      data-title="${escapedTitle}"
+                      data-url="${article.link}"
+                      onclick="handleShare(this, event)"
+                      title="Share Article">&#128228;</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    // --- Search filter ---
+    function filterArticles() {
+      renderArticles();
+    }
+
+    // --- Refresh ---
     function updateRefreshInterval() {
       const interval = parseInt(refreshIntervalSelect.value);
       if (refreshTimer) clearInterval(refreshTimer);
       if (interval > 0) {
         refreshTimer = setInterval(loadNews, interval);
       }
+      savePreferences();
     }
+
     function toggleControls() {
       const panel = document.getElementById('controls-panel');
       panel.classList.toggle('visible');
     }
 
+    // --- Share ---
     function handleShare(btn, event) {
       const title = btn.getAttribute('data-title');
       const url = btn.getAttribute('data-url');
@@ -333,7 +841,6 @@
       event.preventDefault();
       event.stopPropagation();
 
-      // Add tracking parameter
       const trackingUrl = url.includes('?') ? `${url}&ref=tk` : `${url}?ref=tk`;
 
       if (navigator.share) {
@@ -344,20 +851,104 @@
             url: trackingUrl
           });
         } catch (err) {
-          console.log('Error sharing:', err);
+          console.log('Share cancelled:', err);
         }
       } else {
-        // Fallback: Copy to clipboard
         try {
           await navigator.clipboard.writeText(`${title} - ${trackingUrl}`);
-          alert('Link copied to clipboard!');
+          showToast('Link copied to clipboard!');
         } catch (err) {
-          alert('Could not copy link. Manually copy the URL from the article.');
+          showToast('Could not copy link');
         }
       }
     }
 
-    updateTopics(); // Initialize options
+    // --- Back to top ---
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.addEventListener('scroll', () => {
+      backToTopBtn.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    // --- Pull to refresh ---
+    (function initPullToRefresh() {
+      const indicator = document.getElementById('pull-indicator');
+      let startY = 0;
+      let pulling = false;
+
+      document.addEventListener('touchstart', e => {
+        if (window.scrollY === 0) {
+          startY = e.touches[0].clientY;
+          pulling = true;
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchmove', e => {
+        if (!pulling) return;
+        const diff = e.touches[0].clientY - startY;
+        if (diff > 10 && diff < 120) {
+          indicator.classList.add('active', 'pulling');
+          indicator.classList.remove('ready');
+        } else if (diff >= 120) {
+          indicator.classList.add('active', 'ready');
+          indicator.classList.remove('pulling');
+        }
+      }, { passive: true });
+
+      document.addEventListener('touchend', () => {
+        if (!pulling) return;
+        pulling = false;
+        if (indicator.classList.contains('ready')) {
+          indicator.classList.remove('pulling', 'ready');
+          indicator.classList.add('refreshing');
+          loadNews().then(() => {
+            indicator.classList.remove('active', 'refreshing');
+          });
+        } else {
+          indicator.classList.remove('active', 'pulling', 'ready');
+        }
+      });
+    })();
+
+    // --- Keyboard shortcuts ---
+    document.addEventListener('keydown', e => {
+      // Don't trigger shortcuts when typing in search
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+        if (e.key === 'Escape') {
+          searchInput.value = '';
+          searchInput.blur();
+          filterArticles();
+          e.preventDefault();
+        }
+        return;
+      }
+
+      switch (e.key) {
+        case 'r':
+          loadNews();
+          showToast('Refreshing...');
+          break;
+        case 't':
+          const options = topicSelect.options;
+          topicSelect.selectedIndex = (topicSelect.selectedIndex + 1) % options.length;
+          updateTopics();
+          break;
+        case 'd':
+          toggleDarkMode();
+          break;
+        case '/':
+          e.preventDefault();
+          searchInput.focus();
+          break;
+      }
+    });
+
+    // --- Initialize ---
+    initDarkMode();
+    loadPreferences();
+    updateTopics();
     updateRefreshInterval();
   </script>
 </body>
